@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<!-- saved from url=(0057)file:///C:/Users/Acer/Downloads/safestay-admin%20(2).html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SafeStay La Union — Admin Panel</title>
+<link href="./SafeStay La Union — Admin Panel_files/css2" rel="stylesheet">
+<style>
+  :root {
+    --ocean:#0a4f6e;--wave:#1b8fa8;--gold:#f0b429;--coral:#e05c3a;
+    --safe:#1e9e6e;--dark:#0d1a26;--panel:#111e2a;--card:#162330;
+    --border:rgba(255,255,255,0.07);--text:#e8f4f8;--muted:#5a8090;
+    --input:#0d1a26;--danger:#e05c3a;--success:#1e9e6e;--warn:#f0b429;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--dark);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+  /* ══ LOGIN SCREEN ══ */
+  #loginScreen{
+    position:fixed;inset:0;background:var(--dark);
+    display:flex;align-items:center;justify-content:center;
+    z-index:1000;
+    background:
+      radial-gradient(ellipse at 20% 50%,rgba(27,143,168,0.12) 0%,transparent 60%),
+      radial-gradient(ellipse at 80% 20%,rgba(240,180,41,0.08) 0%,transparent 50%),
+      var(--dark);
+  }
+  .login-box{
+    width:100%;max-width:420px;padding:2.5rem;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:24px;
+    box-shadow:0 40px 80px rgba(0,0,0,0.5);
+    position:relative;overflow:hidden;
+  }
+  .login-box::before{
+    content:'';position:absolute;top:-60px;right:-60px;
+    width:200px;height:200px;
+    background:radial-gradient(circle,rgba(27,143,168,0.15),transparent 70%);
+    pointer-events:none;
+  }
+  .login-logo{
+    font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;
+    color:#fff;margin-bottom:0.3rem;
+  }
+  .login-logo span{color:var(--gold);}
+  .login-sub{font-size:0.78rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:2rem;}
+  .login-label{font-size:0.78rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:0.4rem;display:block;}
+  .login-input{
+    width:100%;padding:0.85rem 1rem;
+    background:var(--input);border:1.5px solid rgba(255,255,255,0.08);
+    border-radius:10px;color:var(--text);
+    font-family:'DM Sans',sans-serif;font-size:0.95rem;
+    outline:none;transition:border-color 0.2s;margin-bottom:1rem;
+  }
+  .login-input:focus{border-color:var(--wave);}
+  .login-btn{
+    width:100%;padding:0.9rem;background:linear-gradient(135deg,var(--ocean),var(--wave));
+    color:#fff;border:none;border-radius:10px;
+    font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;
+    cursor:pointer;transition:all 0.2s;letter-spacing:0.02em;
+  }
+  .login-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(27,143,168,0.4);}
+  .login-hint{font-size:0.72rem;color:var(--muted);text-align:center;margin-top:1rem;}
+  .login-err{background:rgba(224,92,58,0.12);border:1px solid rgba(224,92,58,0.3);border-radius:8px;padding:0.6rem 0.9rem;font-size:0.82rem;color:var(--coral);margin-bottom:1rem;display:none;}
+
+  /* ══ MAIN LAYOUT ══ */
+  #adminApp{display:none;}
+  .app-layout{display:flex;min-height:100vh;}
+
+  /* SIDEBAR */
+  .sidebar{
+    width:240px;flex-shrink:0;background:var(--panel);
+    border-right:1px solid var(--border);
+    display:flex;flex-direction:column;
+    position:sticky;top:0;height:100vh;overflow-y:auto;
+  }
+  .sidebar-logo{
+    padding:1.5rem 1.5rem 1rem;
+    border-bottom:1px solid var(--border);
+  }
+  .sidebar-logo .mark{
+    font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:#fff;
+  }
+  .sidebar-logo .mark span{color:var(--gold);}
+  .sidebar-logo .sub{font-size:0.65rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-top:0.2rem;}
+
+  .sidebar-section{padding:1rem 0.75rem 0.5rem;font-size:0.6rem;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;}
+
+  .nav-item{
+    display:flex;align-items:center;gap:0.65rem;
+    padding:0.65rem 1rem;margin:0.1rem 0.5rem;
+    border-radius:10px;cursor:pointer;
+    font-size:0.88rem;color:var(--muted);
+    transition:all 0.15s;border:none;background:none;width:calc(100% - 1rem);text-align:left;
+  }
+  .nav-item:hover{background:rgba(255,255,255,0.04);color:var(--text);}
+  .nav-item.active{background:rgba(27,143,168,0.15);color:var(--wave);font-weight:600;}
+  .nav-item .nav-icon{font-size:1rem;width:20px;text-align:center;}
+  .nav-badge{margin-left:auto;background:var(--coral);color:#fff;font-size:0.6rem;font-weight:700;padding:0.1rem 0.45rem;border-radius:999px;}
+  .nav-badge.green{background:var(--safe);}
+
+  .sidebar-footer{margin-top:auto;padding:1rem;border-top:1px solid var(--border);}
+  .logout-btn{
+    display:flex;align-items:center;gap:0.5rem;
+    width:100%;padding:0.6rem 0.75rem;border-radius:8px;
+    background:rgba(224,92,58,0.08);border:1px solid rgba(224,92,58,0.15);
+    color:var(--coral);font-size:0.82rem;cursor:pointer;transition:all 0.15s;
+    font-family:'DM Sans',sans-serif;
+  }
+  .logout-btn:hover{background:rgba(224,92,58,0.15);}
+
+  /* MAIN CONTENT */
+  .main-content{flex:1;overflow-y:auto;background:var(--dark);}
+
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:1.25rem 2rem;border-bottom:1px solid var(--border);
+    background:var(--panel);position:sticky;top:0;z-index:10;
+  }
+  .topbar-title{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:#fff;}
+  .topbar-right{display:flex;align-items:center;gap:1rem;}
+  .admin-pill{
+    display:flex;align-items:center;gap:0.4rem;
+    background:rgba(30,158,110,0.12);border:1px solid rgba(30,158,110,0.25);
+    border-radius:999px;padding:0.3rem 0.75rem;
+    font-size:0.72rem;color:var(--safe);font-weight:600;
+  }
+  .dot-live{width:6px;height:6px;border-radius:50%;background:var(--safe);animation:pulse-g 2s infinite;}
+  @keyframes pulse-g{0%,100%{box-shadow:0 0 0 0 rgba(30,158,110,0.4);}50%{box-shadow:0 0 0 5px rgba(30,158,110,0);}}
+
+  .page{display:none;padding:2rem;}
+  .page.active{display:block;}
+
+  /* STATS ROW */
+  .stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;margin-bottom:2rem;}
+  .stat-card{
+    background:var(--card);border:1px solid var(--border);border-radius:16px;
+    padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:0.4rem;
+    position:relative;overflow:hidden;
+  }
+  .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent,var(--wave));}
+  .stat-num{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:#fff;line-height:1;}
+  .stat-label{font-size:0.72rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;}
+  .stat-icon{position:absolute;right:1rem;top:1rem;font-size:1.5rem;opacity:0.3;}
+
+  /* SECTION HEADER */
+  .section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;}
+  .section-hdr h2{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:#fff;}
+
+  /* BUTTONS */
+  .btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.6rem 1.2rem;border-radius:8px;font-family:'DM Sans',sans-serif;font-weight:500;font-size:0.85rem;cursor:pointer;border:none;transition:all 0.15s;}
+  .btn-primary{background:linear-gradient(135deg,var(--ocean),var(--wave));color:#fff;}
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(27,143,168,0.3);}
+  .btn-danger{background:rgba(224,92,58,0.15);color:var(--coral);border:1px solid rgba(224,92,58,0.25);}
+  .btn-danger:hover{background:rgba(224,92,58,0.25);}
+  .btn-success{background:rgba(30,158,110,0.15);color:var(--safe);border:1px solid rgba(30,158,110,0.25);}
+  .btn-success:hover{background:rgba(30,158,110,0.25);}
+  .btn-sm{padding:0.35rem 0.75rem;font-size:0.75rem;}
+  .btn-warn{background:rgba(240,180,41,0.12);color:var(--gold);border:1px solid rgba(240,180,41,0.2);}
+
+  /* TABLE */
+  .table-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+  .tbl{width:100%;border-collapse:collapse;}
+  .tbl th{padding:0.75rem 1rem;background:rgba(255,255,255,0.03);font-size:0.68rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;text-align:left;border-bottom:1px solid var(--border);}
+  .tbl td{padding:0.85rem 1rem;font-size:0.85rem;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle;}
+  .tbl tr:last-child td{border-bottom:none;}
+  .tbl tr:hover td{background:rgba(255,255,255,0.02);}
+
+  .status-pill{display:inline-flex;align-items:center;gap:0.3rem;padding:0.2rem 0.65rem;border-radius:999px;font-size:0.68rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;}
+  .status-verified{background:rgba(30,158,110,0.15);color:var(--safe);border:1px solid rgba(30,158,110,0.25);}
+  .status-pending{background:rgba(240,180,41,0.12);color:var(--gold);border:1px solid rgba(240,180,41,0.2);}
+  .status-flagged{background:rgba(224,92,58,0.12);color:var(--coral);border:1px solid rgba(224,92,58,0.2);}
+
+  .actions-cell{display:flex;gap:0.4rem;flex-wrap:wrap;}
+
+  /* FORM MODAL */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:500;align-items:center;justify-content:center;padding:1rem;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:2rem;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;position:relative;}
+  .modal h3{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:#fff;margin-bottom:1.5rem;display:flex;align-items:center;gap:0.5rem;}
+  .modal-close{position:absolute;top:1rem;right:1rem;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:1rem;cursor:pointer;padding:0.3rem 0.6rem;transition:all 0.15s;}
+  .modal-close:hover{color:#fff;}
+
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+  .form-grid.full{grid-template-columns:1fr;}
+  .form-group{display:flex;flex-direction:column;gap:0.4rem;}
+  .form-group.span2{grid-column:span 2;}
+  .form-label{font-size:0.72rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;}
+  .form-input,.form-select,.form-textarea{
+    padding:0.7rem 0.9rem;background:var(--input);
+    border:1.5px solid rgba(255,255,255,0.08);border-radius:8px;
+    color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.88rem;
+    outline:none;transition:border-color 0.2s;
+  }
+  .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--wave);}
+  .form-input::placeholder,.form-textarea::placeholder{color:var(--muted);}
+  .form-select option{background:var(--panel);}
+  .form-textarea{min-height:80px;resize:vertical;}
+  .form-actions{display:flex;gap:0.75rem;justify-content:flex-end;margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--border);}
+
+  /* EMPTY STATE */
+  .empty{text-align:center;padding:3rem;color:var(--muted);}
+  .empty-icon{font-size:2.5rem;margin-bottom:0.75rem;}
+  .empty-text{font-size:0.9rem;line-height:1.6;}
+
+  /* TOAST */
+  .toast{position:fixed;bottom:2rem;right:2rem;background:var(--panel);border:1px solid var(--border);color:var(--text);padding:0.85rem 1.5rem;border-radius:12px;font-size:0.88rem;font-weight:500;opacity:0;transition:all 0.3s ease;z-index:600;pointer-events:none;box-shadow:0 8px 30px rgba(0,0,0,0.4);display:flex;align-items:center;gap:0.5rem;}
+  .toast.show{opacity:1;transform:translateY(-4px);}
+  .toast.success{border-color:rgba(30,158,110,0.4);}
+  .toast.error{border-color:rgba(224,92,58,0.4);}
+
+  /* SEARCH BAR */
+  .search-bar{position:relative;margin-bottom:1.25rem;}
+  .search-input{width:100%;max-width:320px;padding:0.65rem 0.9rem 0.65rem 2.4rem;background:var(--card);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.85rem;outline:none;transition:border-color 0.2s;}
+  .search-input:focus{border-color:var(--wave);}
+  .search-icon{position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);color:var(--muted);font-size:0.9rem;}
+
+  /* DETAIL VIEW */
+  .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:1rem;}
+  .detail-item{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:0.75rem 1rem;}
+  .detail-key{font-size:0.65rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.3rem;}
+  .detail-val{font-size:0.88rem;color:var(--text);font-weight:500;}
+
+  /* SCAM FLAGGED ROW */
+  .flagged-row{background:rgba(224,92,58,0.04);}
+  .flagged-row:hover td{background:rgba(224,92,58,0.06) !important;}
+
+  /* RESPONSIVE */
+  @media(max-width:768px){
+    .sidebar{display:none;}
+    .form-grid{grid-template-columns:1fr;}
+    .form-group.span2{grid-column:span 1;}
+    .stats-row{grid-template-columns:1fr 1fr;}
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">Safe<span>Stay</span> La Union</div>
+    <div class="login-sub">Admin Control Panel</div>
+    <div class="login-err" id="loginErr">❌ Incorrect username or password.</div>
+    <label class="login-label">Username</label>
+    <input class="login-input" id="loginUser" type="text" placeholder="admin" autocomplete="username">
+    <label class="login-label">Password</label>
+    <input class="login-input" id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password">
+    <button class="login-btn" onclick="doLogin()">🔐 Sign In to Admin Panel</button>
+    <div class="login-hint">🛡️ Authorized personnel only · SafeStay La Union</div>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div id="adminApp">
+<div class="app-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="mark">Safe<span>Stay</span> LU</div>
+      <div class="sub">Admin Panel</div>
+    </div>
+
+    <div class="sidebar-section">Main</div>
+    <button class="nav-item active" onclick="showPage(&#39;dashboard&#39;,this)">
+      <span class="nav-icon">📊</span> Dashboard
+    </button>
+
+    <div class="sidebar-section">Directory</div>
+    <button class="nav-item" onclick="showPage(&#39;establishments&#39;,this)">
+      <span class="nav-icon">🏨</span> Establishments
+      <span class="nav-badge green" id="verifiedCount">0</span>
+    </button>
+    <button class="nav-item" onclick="showPage(&#39;pending&#39;,this)">
+      <span class="nav-icon">⏳</span> Pending Review
+      <span class="nav-badge" id="pendingCount" style="display:none"></span>
+    </button>
+
+    <div class="sidebar-section">Safety</div>
+    <button class="nav-item" onclick="showPage(&#39;scams&#39;,this)">
+      <span class="nav-icon">🚨</span> Scam Reports
+      <span class="nav-badge" id="scamCount">0</span>
+    </button>
+    <button class="nav-item" onclick="showPage(&#39;flagged&#39;,this)">
+      <span class="nav-icon">⛔</span> Flagged Numbers
+    </button>
+
+    <div class="sidebar-footer">
+      <div style="font-size:0.72rem;color:var(--muted);margin-bottom:0.5rem;">Signed in as <strong style="color:var(--text);">Admin</strong></div>
+      <button class="logout-btn" onclick="doLogout()">🚪 Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+      <div class="topbar-right">
+        <div class="admin-pill"><span class="dot-live"></span>System Active</div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-row">
+        <div class="stat-card" style="--accent:var(--safe)">
+          <div class="stat-icon">🏨</div>
+          <div class="stat-num" id="dash-verified">0</div>
+          <div class="stat-label">Verified Establishments</div>
+        </div>
+        <div class="stat-card" style="--accent:var(--gold)">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-num" id="dash-pending">0</div>
+          <div class="stat-label">Pending Review</div>
+        </div>
+        <div class="stat-card" style="--accent:var(--coral)">
+          <div class="stat-icon">🚨</div>
+          <div class="stat-num" id="dash-scams">0</div>
+          <div class="stat-label">Scam Reports</div>
+        </div>
+        <div class="stat-card" style="--accent:var(--wave)">
+          <div class="stat-icon">⛔</div>
+          <div class="stat-num" id="dash-flagged">0</div>
+          <div class="stat-label">Flagged Numbers</div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="section-hdr"><h2>📋 Recent Activity</h2></div>
+      <div class="table-wrap">
+        <table class="tbl">
+          <thead><tr><th>Time</th><th>Action</th><th>Details</th><th>Status</th></tr></thead>
+          <tbody id="activityLog">
+            <tr><td colspan="4"><div class="empty"><div class="empty-icon">📭</div><div class="empty-text">No activity yet. Add your first establishment to get started.</div></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ESTABLISHMENTS -->
+    <div class="page" id="page-establishments">
+      <div class="section-hdr">
+        <h2>🏨 Verified Establishments</h2>
+        <button class="btn btn-primary" onclick="openAddModal()">＋ Add Establishment</button>
+      </div>
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" id="searchEstab" placeholder="Search by name, type, location…" oninput="renderEstablishments()">
+      </div>
+      <div class="table-wrap">
+        <table class="tbl">
+          <thead><tr><th>Establishment</th><th>Type</th><th>Location</th><th>GCash</th><th>Permit No.</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="establishmentsList"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PENDING -->
+    <div class="page" id="page-pending">
+      <div class="section-hdr">
+        <h2>⏳ Pending Review</h2>
+        <button class="btn btn-primary" onclick="openAddModal(&#39;pending&#39;)">＋ Add for Review</button>
+      </div>
+      <div class="table-wrap">
+        <table class="tbl">
+          <thead><tr><th>Business Name</th><th>Type</th><th>Contact</th><th>Submitted</th><th>Actions</th></tr></thead>
+          <tbody id="pendingList"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SCAM REPORTS -->
+    <div class="page" id="page-scams">
+      <div class="section-hdr">
+        <h2>🚨 Scam Reports</h2>
+        <button class="btn btn-danger" onclick="openScamModal()">＋ Log Scam Report</button>
+      </div>
+      <div class="table-wrap">
+        <table class="tbl">
+          <thead><tr><th>Date</th><th>Type</th><th>Suspicious Account/Name</th><th>Amount Lost</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="scamsList"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- FLAGGED NUMBERS -->
+    <div class="page" id="page-flagged">
+      <div class="section-hdr">
+        <h2>⛔ Flagged GCash &amp; Accounts</h2>
+        <button class="btn btn-danger" onclick="openFlagModal()">＋ Flag New Number</button>
+      </div>
+      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:1.25rem;">These numbers are shown as SCAM ALERT when tourists check them on the SafeStay website.</p>
+      <div class="table-wrap">
+        <table class="tbl">
+          <thead><tr><th>Number / Name</th><th>Type</th><th>Date Flagged</th><th>Case Reference</th><th>Actions</th></tr></thead>
+          <tbody id="flaggedList"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+</div>
+
+<!-- ADD ESTABLISHMENT MODAL -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal(&#39;addModal&#39;)">✕</button>
+    <h3 id="modalTitle">🏨 Add Verified Establishment</h3>
+    <div class="form-grid">
+      <div class="form-group span2">
+        <label class="form-label">Business Name *</label>
+        <input class="form-input" id="f-name" placeholder="e.g. Insan Seabeds">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Type *</label>
+        <select class="form-select" id="f-type">
+          <option value="">Select type…</option>
+          <option value="resort">Beach Resort</option>
+          <option value="inn">Inn / Transient House</option>
+          <option value="hotel">Hotel</option>
+          <option value="hostel">Hostel / Surf Camp</option>
+          <option value="glamping">Glamping / Eco-Stay</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Emoji Icon</label>
+        <input class="form-input" id="f-emoji" placeholder="🌊" maxlength="4">
+      </div>
+      <div class="form-group span2">
+        <label class="form-label">Complete Address *</label>
+        <input class="form-input" id="f-address" placeholder="e.g. Urbiztondo, San Juan, La Union 2514">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Owner / Contact Person *</label>
+        <input class="form-input" id="f-owner" placeholder="Full name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contact Number *</label>
+        <input class="form-input" id="f-contact" placeholder="09XX-XXX-XXXX">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-input" id="f-email" placeholder="business@email.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Facebook Page URL</label>
+        <input class="form-input" id="f-facebook" placeholder="facebook.com/...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Official GCash Number *</label>
+        <input class="form-input" id="f-gcash" placeholder="09XX-XXX-XXXX">
+      </div>
+      <div class="form-group">
+        <label class="form-label">GCash Registered Name *</label>
+        <input class="form-input" id="f-gcash-name" placeholder="Name shown on GCash">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Bank Name</label>
+        <input class="form-input" id="f-bank" placeholder="e.g. BDO, BPI, UnionBank">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Bank Account Number</label>
+        <input class="form-input" id="f-bank-num" placeholder="Account number">
+      </div>
+      <div class="form-group span2">
+        <label class="form-label">Bank Account Name</label>
+        <input class="form-input" id="f-bank-name" placeholder="Name on bank account">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mayor's Permit / DTI No. *</label>
+        <input class="form-input" id="f-permit" placeholder="e.g. SJ-2025-001">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-select" id="f-status">
+          <option value="verified">✅ Verified</option>
+          <option value="pending">⏳ Pending Review</option>
+        </select>
+      </div>
+      <div class="form-group span2">
+        <label class="form-label">Accepted Payment Methods</label>
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.25rem;">
+          <label style="display:flex;align-items:center;gap:0.3rem;font-size:0.82rem;cursor:pointer;"><input type="checkbox" id="pay-gcash" checked=""> GCash</label>
+          <label style="display:flex;align-items:center;gap:0.3rem;font-size:0.82rem;cursor:pointer;"><input type="checkbox" id="pay-maya"> Maya</label>
+          <label style="display:flex;align-items:center;gap:0.3rem;font-size:0.82rem;cursor:pointer;"><input type="checkbox" id="pay-bdo"> BDO</label>
+          <label style="display:flex;align-items:center;gap:0.3rem;font-size:0.82rem;cursor:pointer;"><input type="checkbox" id="pay-bpi"> BPI</label>
+          <label style="display:flex;align-items:center;gap:0.3rem;font-size:0.82rem;cursor:pointer;"><input type="checkbox" id="pay-metro"> Metrobank</label>
+          <label style="display:flex;align-items:center;gap:0.3rem;font-size:0.82rem;cursor:pointer;"><input type="checkbox" id="pay-cash" checked=""> Cash</label>
+        </div>
+      </div>
+      <div class="form-group span2">
+        <label class="form-label">Admin Notes</label>
+        <textarea class="form-textarea" id="f-notes" placeholder="Verification notes, visit date, observations…"></textarea>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn" onclick="closeModal(&#39;addModal&#39;)" style="background:rgba(255,255,255,0.05);color:var(--muted);">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEstablishment()">✅ Save Establishment</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCAM REPORT MODAL -->
+<div class="modal-overlay" id="scamModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal(&#39;scamModal&#39;)">✕</button>
+    <h3>🚨 Log Scam Report</h3>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Scam Type *</label>
+        <select class="form-select" id="s-type">
+          <option value="">Select…</option>
+          <option>Ghost Listing</option>
+          <option>Fake GCash / E-wallet</option>
+          <option>Twin Impersonator Page</option>
+          <option>Messenger Scam</option>
+          <option>Fake Bank Account</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date Reported</label>
+        <input class="form-input" id="s-date" type="date">
+      </div>
+      <div class="form-group span2">
+        <label class="form-label">Suspicious Account / Business Name *</label>
+        <input class="form-input" id="s-account" placeholder="GCash number or fake page name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Amount Lost</label>
+        <input class="form-input" id="s-amount" placeholder="e.g. ₱4,000">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Reporter (optional)</label>
+        <input class="form-input" id="s-reporter" placeholder="Anonymous if blank">
+      </div>
+      <div class="form-group span2">
+        <label class="form-label">Description *</label>
+        <textarea class="form-textarea" id="s-desc" placeholder="What happened? Describe the scam…"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-select" id="s-status">
+          <option value="new">🆕 New</option>
+          <option value="investigating">🔍 Investigating</option>
+          <option value="forwarded">📨 Forwarded to PNP</option>
+          <option value="resolved">✅ Resolved</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Flag Account?</label>
+        <select class="form-select" id="s-flag">
+          <option value="yes">✅ Yes — Add to Flagged Database</option>
+          <option value="no">No — Keep under review only</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn" onclick="closeModal(&#39;scamModal&#39;)" style="background:rgba(255,255,255,0.05);color:var(--muted);">Cancel</button>
+      <button class="btn btn-danger" onclick="saveScam()">🚨 Save Scam Report</button>
+    </div>
+  </div>
+</div>
+
+<!-- FLAG MODAL -->
+<div class="modal-overlay" id="flagModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal(&#39;flagModal&#39;)">✕</button>
+    <h3>⛔ Flag a Number or Name</h3>
+    <div class="form-grid full">
+      <div class="form-group">
+        <label class="form-label">GCash Number / Account / Business Name *</label>
+        <input class="form-input" id="fl-number" placeholder="09XX-XXX-XXXX or fake page name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Type</label>
+        <select class="form-select" id="fl-type">
+          <option>GCash Number</option>
+          <option>Bank Account</option>
+          <option>Fake Facebook Page</option>
+          <option>Fake Business Name</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Case Reference (optional)</label>
+        <input class="form-input" id="fl-ref" placeholder="e.g. Scam Report #001">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Reason</label>
+        <textarea class="form-textarea" id="fl-reason" placeholder="Why is this being flagged?" style="min-height:60px;"></textarea>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn" onclick="closeModal(&#39;flagModal&#39;)" style="background:rgba(255,255,255,0.05);color:var(--muted);">Cancel</button>
+      <button class="btn btn-danger" onclick="saveFlag()">⛔ Flag This Number</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══ AUTH ══
+const ADMIN_USER = 'safestay';
+const ADMIN_PASS = 'launion2026';
+
+function doLogin(){
+  const u=document.getElementById('loginUser').value.trim();
+  const p=document.getElementById('loginPass').value;
+  const err=document.getElementById('loginErr');
+  if(u===ADMIN_USER && p===ADMIN_PASS){
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('adminApp').style.display='block';
+    updateDashboard();
+    renderEstablishments();
+    renderPending();
+    renderScams();
+    renderFlagged();
+  } else {
+    err.style.display='block';
+    setTimeout(()=>err.style.display='none',3000);
+  }
+}
+
+function doLogout(){
+  document.getElementById('loginUser').value='';
+  document.getElementById('loginPass').value='';
+  document.getElementById('adminApp').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+}
+
+document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+document.getElementById('loginUser').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+
+// ══ DATA STORE ══
+let establishments = [
+  {id:1,name:'Insan Seabeds',type:'resort',emoji:'🌊',address:'Urbiztondo, San Juan, La Union 2514',owner:'',contact:'0917 839 2782',email:'insanseabeds@gmail.com',facebook:'',gcash:'',gcashName:'',bank:'',bankNum:'',bankName:'',permit:'',payments:['GCash','Cash'],status:'pending',notes:'Community-verified request. Await permit submission.',date:'2026-05-01'},
+  {id:2,name:'Nook Traveller\'s Inn',type:'inn',emoji:'🏡',address:'Along Nat\'l Highway corner Rd to Kabsat, Urbiztondo, San Juan, La Union',owner:'',contact:'0946 454 9852',email:'',facebook:'',gcash:'',gcashName:'',bank:'',bankNum:'',bankName:'',permit:'',payments:['GCash','Cash'],status:'pending',notes:'2K followers, 100% recommendation rate. Contact for verification.',date:'2026-05-01'},
+];
+let scams=[
+  {id:1,type:'Fake GCash / E-wallet',account:'09608945904',amount:'₱4,000',reporter:'Anonymous',desc:'Victim transferred ₱4,000 via GCash for accommodation booking. Scammer vanished after payment. Reported to authorities.',date:'2025-05-20',status:'forwarded'},
+];
+let flagged=[
+  {id:1,number:'09608945904',type:'GCash Number',ref:'Scam Report #001',reason:'Confirmed ₱4,000 scam. Reported to PNP.',date:'2025-05-20'},
+  {id:2,number:'EM Royalle',type:'Fake Facebook Page',ref:'',reason:'Impersonator page of Em Royale Beachfront Resort. Nearly identical name, 2.1K followers, no verification.',date:'2026-01-01'},
+];
+let activity=[];
+let nextId=10;
+
+// ══ NAVIGATION ══
+function showPage(page,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  btn.classList.add('active');
+  const titles={dashboard:'Dashboard',establishments:'Verified Establishments',pending:'Pending Review',scams:'Scam Reports',flagged:'Flagged Numbers'};
+  document.getElementById('topbarTitle').textContent=titles[page]||page;
+}
+
+// ══ DASHBOARD ══
+function updateDashboard(){
+  const v=establishments.filter(e=>e.status==='verified').length;
+  const p=establishments.filter(e=>e.status==='pending').length;
+  document.getElementById('dash-verified').textContent=v;
+  document.getElementById('dash-pending').textContent=p;
+  document.getElementById('dash-scams').textContent=scams.length;
+  document.getElementById('dash-flagged').textContent=flagged.length;
+  document.getElementById('verifiedCount').textContent=v;
+  const pb=document.getElementById('pendingCount');
+  if(p>0){pb.textContent=p;pb.style.display='inline-block';}else{pb.style.display='none';}
+  document.getElementById('scamCount').textContent=scams.length;
+  renderActivity();
+}
+
+function renderActivity(){
+  const tbody=document.getElementById('activityLog');
+  if(activity.length===0){
+    tbody.innerHTML='<tr><td colspan="4"><div class="empty"><div class="empty-icon">📭</div><div class="empty-text">No activity yet.</div></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML=activity.slice(-10).reverse().map(a=>`
+    <tr>
+      <td style="color:var(--muted);font-size:0.78rem;">${a.time}</td>
+      <td>${a.action}</td>
+      <td style="color:var(--muted);">${a.detail}</td>
+      <td><span class="status-pill ${a.type==='success'?'status-verified':a.type==='warn'?'status-pending':'status-flagged'}">${a.status}</span></td>
+    </tr>`).join('');
+}
+
+function logActivity(action,detail,type='success',status='Done'){
+  const now=new Date();
+  activity.push({time:now.toLocaleTimeString(),action,detail,type,status});
+  renderActivity();
+}
+
+// ══ ESTABLISHMENTS ══
+function renderEstablishments(){
+  const q=(document.getElementById('searchEstab')?.value||'').toLowerCase();
+  const list=establishments.filter(e=>e.status==='verified'&&(e.name.toLowerCase().includes(q)||e.type.includes(q)||e.address.toLowerCase().includes(q)));
+  const tbody=document.getElementById('establishmentsList');
+  if(list.length===0){
+    tbody.innerHTML='<tr><td colspan="7"><div class="empty"><div class="empty-icon">🏨</div><div class="empty-text">No verified establishments yet.<br>Click "Add Establishment" to get started.</div></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML=list.map(e=>`
+    <tr>
+      <td><strong>${e.emoji} ${e.name}</strong></td>
+      <td style="text-transform:capitalize;">${e.type}</td>
+      <td style="color:var(--muted);font-size:0.8rem;">${e.address}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:0.8rem;">${e.gcash||'—'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:0.8rem;">${e.permit||'—'}</td>
+      <td><span class="status-pill status-verified">✅ Verified</span></td>
+      <td><div class="actions-cell">
+        <button class="btn btn-warn btn-sm" onclick="editEstab(${e.id})">✏️ Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteEstab(${e.id})">🗑️</button>
+      </div></td>
+    </tr>`).join('');
+  updateDashboard();
+}
+
+function renderPending(){
+  const list=establishments.filter(e=>e.status==='pending');
+  const tbody=document.getElementById('pendingList');
+  if(list.length===0){
+    tbody.innerHTML='<tr><td colspan="5"><div class="empty"><div class="empty-icon">⏳</div><div class="empty-text">No pending establishments.</div></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML=list.map(e=>`
+    <tr>
+      <td><strong>${e.emoji||'🏨'} ${e.name}</strong></td>
+      <td style="text-transform:capitalize;">${e.type}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:0.8rem;">${e.contact||'—'}</td>
+      <td style="color:var(--muted);font-size:0.8rem;">${e.date||'—'}</td>
+      <td><div class="actions-cell">
+        <button class="btn btn-success btn-sm" onclick="approveEstab(${e.id})">✅ Approve</button>
+        <button class="btn btn-warn btn-sm" onclick="editEstab(${e.id})">✏️ Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteEstab(${e.id})">🗑️</button>
+      </div></td>
+    </tr>`).join('');
+  updateDashboard();
+}
+
+// ══ MODALS ══
+let editingId=null;
+
+function openAddModal(defaultStatus='verified'){
+  editingId=null;
+  document.getElementById('modalTitle').textContent='🏨 Add Establishment';
+  clearForm();
+  document.getElementById('f-status').value=defaultStatus;
+  openModal('addModal');
+}
+
+function editEstab(id){
+  const e=establishments.find(x=>x.id===id);
+  if(!e)return;
+  editingId=id;
+  document.getElementById('modalTitle').textContent='✏️ Edit — '+e.name;
+  document.getElementById('f-name').value=e.name;
+  document.getElementById('f-type').value=e.type;
+  document.getElementById('f-emoji').value=e.emoji||'';
+  document.getElementById('f-address').value=e.address;
+  document.getElementById('f-owner').value=e.owner||'';
+  document.getElementById('f-contact').value=e.contact||'';
+  document.getElementById('f-email').value=e.email||'';
+  document.getElementById('f-facebook').value=e.facebook||'';
+  document.getElementById('f-gcash').value=e.gcash||'';
+  document.getElementById('f-gcash-name').value=e.gcashName||'';
+  document.getElementById('f-bank').value=e.bank||'';
+  document.getElementById('f-bank-num').value=e.bankNum||'';
+  document.getElementById('f-bank-name').value=e.bankName||'';
+  document.getElementById('f-permit').value=e.permit||'';
+  document.getElementById('f-status').value=e.status;
+  document.getElementById('f-notes').value=e.notes||'';
+  ['gcash','maya','bdo','bpi','metro','cash'].forEach(p=>
+    document.getElementById('pay-'+p).checked=(e.payments||[]).includes(p.charAt(0).toUpperCase()+p.slice(1)));
+  openModal('addModal');
+}
+
+function approveEstab(id){
+  const e=establishments.find(x=>x.id===id);
+  if(!e)return;
+  e.status='verified';
+  logActivity('✅ Approved',e.name,'success','Verified');
+  renderEstablishments();
+  renderPending();
+  updateDashboard();
+  showToast('✅ '+e.name+' approved and verified!','success');
+}
+
+function deleteEstab(id){
+  const e=establishments.find(x=>x.id===id);
+  if(!e||!confirm('Remove '+e.name+' from the directory?'))return;
+  establishments=establishments.filter(x=>x.id!==id);
+  logActivity('🗑️ Removed',e.name,'danger','Deleted');
+  renderEstablishments();
+  renderPending();
+  updateDashboard();
+  showToast('🗑️ '+e.name+' removed.','error');
+}
+
+function clearForm(){
+  ['f-name','f-address','f-owner','f-contact','f-email','f-facebook','f-gcash','f-gcash-name','f-bank','f-bank-num','f-bank-name','f-permit','f-notes','f-emoji'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-type').value='';
+  document.getElementById('f-status').value='verified';
+  ['gcash','cash'].forEach(p=>document.getElementById('pay-'+p).checked=true);
+  ['maya','bdo','bpi','metro'].forEach(p=>document.getElementById('pay-'+p).checked=false);
+}
+
+function saveEstablishment(){
+  const name=document.getElementById('f-name').value.trim();
+  const type=document.getElementById('f-type').value;
+  if(!name){showToast('❌ Business name is required.','error');return;}
+  if(!type){showToast('❌ Please select a type.','error');return;}
+  const payments=[];
+  [{id:'pay-gcash',lbl:'GCash'},{id:'pay-maya',lbl:'Maya'},{id:'pay-bdo',lbl:'BDO'},{id:'pay-bpi',lbl:'BPI'},{id:'pay-metro',lbl:'Metrobank'},{id:'pay-cash',lbl:'Cash'}]
+    .forEach(p=>{if(document.getElementById(p.id).checked)payments.push(p.lbl);});
+  const data={
+    id:editingId||nextId++,
+    name,type,
+    emoji:document.getElementById('f-emoji').value||'🏨',
+    address:document.getElementById('f-address').value,
+    owner:document.getElementById('f-owner').value,
+    contact:document.getElementById('f-contact').value,
+    email:document.getElementById('f-email').value,
+    facebook:document.getElementById('f-facebook').value,
+    gcash:document.getElementById('f-gcash').value,
+    gcashName:document.getElementById('f-gcash-name').value,
+    bank:document.getElementById('f-bank').value,
+    bankNum:document.getElementById('f-bank-num').value,
+    bankName:document.getElementById('f-bank-name').value,
+    permit:document.getElementById('f-permit').value,
+    status:document.getElementById('f-status').value,
+    notes:document.getElementById('f-notes').value,
+    payments,
+    date:new Date().toISOString().split('T')[0],
+  };
+  if(editingId){
+    const idx=establishments.findIndex(x=>x.id===editingId);
+    establishments[idx]=data;
+    logActivity('✏️ Updated',name,'success','Updated');
+    showToast('✅ '+name+' updated successfully!','success');
+  } else {
+    establishments.push(data);
+    logActivity('➕ Added',name,data.status==='verified'?'success':'warn',data.status==='verified'?'Verified':'Pending');
+    showToast('✅ '+name+' added!','success');
+  }
+  closeModal('addModal');
+  renderEstablishments();
+  renderPending();
+  updateDashboard();
+}
+
+// ══ SCAMS ══
+function renderScams(){
+  const tbody=document.getElementById('scamsList');
+  if(scams.length===0){
+    tbody.innerHTML='<tr><td colspan="6"><div class="empty"><div class="empty-icon">✅</div><div class="empty-text">No scam reports logged yet.</div></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML=scams.map(s=>{
+    const statusMap={new:'status-pending',investigating:'status-pending',forwarded:'status-verified',resolved:'status-verified'};
+    const statusLabel={new:'🆕 New',investigating:'🔍 Investigating',forwarded:'📨 Forwarded',resolved:'✅ Resolved'};
+    return `<tr class="${s.type.includes('GCash')||s.type.includes('ghost')?'flagged-row':''}">
+      <td style="color:var(--muted);font-size:0.8rem;">${s.date}</td>
+      <td style="font-size:0.82rem;">${s.type}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:0.82rem;color:var(--coral);">${s.account}</td>
+      <td style="color:var(--coral);font-weight:600;">${s.amount||'Unknown'}</td>
+      <td><span class="status-pill ${statusMap[s.status]||'status-pending'}">${statusLabel[s.status]||s.status}</span></td>
+      <td><div class="actions-cell">
+        <button class="btn btn-danger btn-sm" onclick="deleteScam(${s.id})">🗑️</button>
+      </div></td>
+    </tr>`;}).join('');
+  updateDashboard();
+}
+
+function openScamModal(){
+  document.getElementById('s-date').value=new Date().toISOString().split('T')[0];
+  openModal('scamModal');
+}
+
+function saveScam(){
+  const type=document.getElementById('s-type').value;
+  const account=document.getElementById('s-account').value.trim();
+  const desc=document.getElementById('s-desc').value.trim();
+  if(!type||!account||!desc){showToast('❌ Please fill all required fields.','error');return;}
+  const s={
+    id:nextId++,type,account,
+    amount:document.getElementById('s-amount').value,
+    reporter:document.getElementById('s-reporter').value||'Anonymous',
+    desc,
+    date:document.getElementById('s-date').value,
+    status:document.getElementById('s-status').value,
+  };
+  scams.push(s);
+  if(document.getElementById('s-flag').value==='yes'){
+    flagged.push({id:nextId++,number:account,type:'GCash Number',ref:'Scam Report #'+s.id,reason:desc,date:s.date});
+    renderFlagged();
+  }
+  logActivity('🚨 Scam logged',account,'danger','Reported');
+  closeModal('scamModal');
+  renderScams();
+  updateDashboard();
+  showToast('🚨 Scam report saved!','error');
+}
+
+function deleteScam(id){
+  if(!confirm('Delete this scam report?'))return;
+  scams=scams.filter(s=>s.id!==id);
+  renderScams();
+  updateDashboard();
+  showToast('🗑️ Report deleted.','error');
+}
+
+// ══ FLAGGED ══
+function renderFlagged(){
+  const tbody=document.getElementById('flaggedList');
+  if(flagged.length===0){
+    tbody.innerHTML='<tr><td colspan="5"><div class="empty"><div class="empty-icon">✅</div><div class="empty-text">No flagged numbers yet.</div></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML=flagged.map(f=>`
+    <tr class="flagged-row">
+      <td style="font-family:'DM Mono',monospace;color:var(--coral);font-weight:600;">${f.number}</td>
+      <td style="font-size:0.82rem;">${f.type}</td>
+      <td style="color:var(--muted);font-size:0.8rem;">${f.date}</td>
+      <td style="color:var(--muted);font-size:0.8rem;">${f.ref||'—'}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteFlag(${f.id})">🗑️ Remove</button></td>
+    </tr>`).join('');
+  updateDashboard();
+}
+
+function openFlagModal(){openModal('flagModal');}
+
+function saveFlag(){
+  const number=document.getElementById('fl-number').value.trim();
+  if(!number){showToast('❌ Please enter a number or name.','error');return;}
+  flagged.push({
+    id:nextId++,number,
+    type:document.getElementById('fl-type').value,
+    ref:document.getElementById('fl-ref').value,
+    reason:document.getElementById('fl-reason').value,
+    date:new Date().toISOString().split('T')[0],
+  });
+  logActivity('⛔ Flagged',number,'danger','Flagged');
+  closeModal('flagModal');
+  renderFlagged();
+  updateDashboard();
+  showToast('⛔ '+number+' has been flagged!','error');
+  document.getElementById('fl-number').value='';
+  document.getElementById('fl-ref').value='';
+  document.getElementById('fl-reason').value='';
+}
+
+function deleteFlag(id){
+  if(!confirm('Remove this flagged entry?'))return;
+  flagged=flagged.filter(f=>f.id!==id);
+  renderFlagged();
+  updateDashboard();
+  showToast('🗑️ Flag removed.','error');
+}
+
+// ══ MODAL HELPERS ══
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(o=>{
+  o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');});
+});
+
+// ══ TOAST ══
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast show '+(type||'');
+  setTimeout(()=>t.className='toast',3500);
+}
+</script>
+
+
+</body></html>
